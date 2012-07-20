@@ -1,6 +1,7 @@
 (ns lalea.config
   (:use [korma.core]
-        [korma.db]))
+        [korma.db])
+  (:require [lalea.test :as test]))
 
 (defdb db
     (mysql {:host "localhost"
