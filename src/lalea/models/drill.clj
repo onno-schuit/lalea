@@ -1,12 +1,5 @@
-(ns lalea.models.drill
-  (:use [korma.core]
-        [korma.db])
-  (:require [lalea.config :as config]))
+(ns lalea.models.drill)
+(load "/lalea/config")
 
 (defentity drill
     (table :drills))
-
-(defn test2
-  []
-  (println "test2"))
-

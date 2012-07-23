@@ -1,14 +1,5 @@
-(ns lalea.config
-  (:use [korma.core])
-  (:require [lalea.test :as test]
-            [korma.db :as db]))
-
-
-(def test-result "Okay!")
-
-(defn show-test-result
-  []
-  (println test-result))
+(use 'korma.core)
+(require '[korma.db :as db])
 
 (db/defdb db
     (db/mysql {:host "localhost"
@@ -17,5 +8,3 @@
                :db "lalea"
                :user "root"
                :password "paarse" }))
-
-(test/no-can-do "This is impossible")
