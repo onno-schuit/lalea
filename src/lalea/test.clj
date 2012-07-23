@@ -3,3 +3,8 @@
 (defn print-myvar
   []
   (println myvar))
+
+
+(defn no-can-do
+  [a-string]
+  (println a-string))
