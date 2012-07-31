@@ -8,5 +8,6 @@
                [:title "lalea"]
                (include-css "/css/reset.css")]
               [:body
+               [:h1 "Lalea Rocks!"]
                [:div#wrapper
                 content]]))

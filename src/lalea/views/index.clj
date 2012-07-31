@@ -12,3 +12,9 @@
   (common/layout
     [:p "Welcome to lalea from index.clj"]))
 
+
+(defpage "/test"
+  []
+  (common/layout
+    [:p "Welcome to Lalea's test page!"]))
+

@@ -4,6 +4,7 @@
             [noir.session :as session]
             [lalea.models.user :as user])
   (:use [noir.core :only [defpage]]
+        [noir.request]
         [hiccup.form]))
 
 (defpage [:get "/login"] {}
@@ -15,8 +16,16 @@
                (submit-button "Login"))))
 
 
+(defn get-referer []
+    ((:headers (ring-request)) "referer"))
+
+
 (defpage [:post "/login"] {:as candidate}
   (if (user/login! candidate)
     ;(resp/redirect "/"))
-    (println (str "You are now logged in [redirect to original page] as: " (session/get :username)))
-    (println "Sorry, your login attempt failed [render login screen with error flash]")))
+    (do 
+      (println (str "You are now logged in [redirect to original page: " get-referer "] as: " (session/get :username)))
+      (resp/redirect "/"))
+    (do 
+      (println "Sorry, your login attempt failed [render login screen with error flash]")
+      (resp/redirect "/login") )))
