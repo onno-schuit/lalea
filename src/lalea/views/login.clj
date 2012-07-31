@@ -7,6 +7,7 @@
         [noir.request]
         [hiccup.form]))
 
+
 (defpage [:get "/login"] {}
          (common/layout
            [:p "Please login"]
@@ -24,8 +25,14 @@
   (if (user/login! candidate)
     ;(resp/redirect "/"))
     (do 
-      (println (str "You are now logged in [redirect to original page: " get-referer "] as: " (session/get :username)))
-      (resp/redirect "/"))
+      (println (str "You are now logged in [redirect to original page: " (get-referer) "] as: " (session/get :username)))
+      (resp/redirect "/")) 
     (do 
       (println "Sorry, your login attempt failed [render login screen with error flash]")
       (resp/redirect "/login") )))
+
+
+(defpage [:get "/logout"] {}
+  (do
+    (session/remove! :username)
+    (resp/redirect "/")))
