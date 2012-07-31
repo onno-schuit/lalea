@@ -1,10 +1,12 @@
 (ns lalea.views.login
   (:require [lalea.views.common :as common]
-            [noir.response :as resp])
+            [noir.response :as resp]
+            [noir.session :as session]
+            [lalea.models.user :as user])
   (:use [noir.core :only [defpage]]
         [hiccup.form]))
 
-(defpage "/login" []
+(defpage [:get "/login"] {}
          (common/layout
            [:p "Please login"]
            (form-to [:post "/login"]
@@ -13,8 +15,8 @@
                (submit-button "Login"))))
 
 
-(defpage [:post "/authenticate"] {:as user}
-  (if (user/login! user)
+(defpage [:post "/login"] {:as candidate}
+  (if (user/login! candidate)
     ;(resp/redirect "/"))
-    (println "You are now logged in [redirect to original page]")
+    (println (str "You are now logged in [redirect to original page] as: " (session/get :username)))
     (println "Sorry, your login attempt failed [render login screen with error flash]")))
