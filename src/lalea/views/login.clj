@@ -8,25 +8,24 @@
         [hiccup.form]))
 
 
-(defpage [:get "/login"] {}
-         (common/layout
-           [:p "Please login"]
-           (form-to [:post "/login"]
-               (text-field "username")
-               (password-field "password")
-               (submit-button "Login"))))
+
+(defpage [:get "/login"] {:as querystring}
+  (common/layout
+    [:p (str "Please login to access " (:origin querystring))]
+    (form-to [:post "/login"]
+      (hidden-field "origin" (:origin querystring))
+      (text-field "username")
+      (password-field "password")
+      (submit-button "Login"))))
 
 
-(defn get-referer []
-    ((:headers (ring-request)) "referer"))
 
 
 (defpage [:post "/login"] {:as candidate}
   (if (user/login! candidate)
-    ;(resp/redirect "/"))
     (do 
-      (println (str "You are now logged in [redirect to original page: " (get-referer) "] as: " (session/get :username)))
-      (resp/redirect "/")) 
+      (println (str "You are now logged in [redirect to original page: " (:origin candidate) "] as: " (session/get :username)))
+      (resp/redirect (:origin candidate))) 
     (do 
       (println "Sorry, your login attempt failed [render login screen with error flash]")
       (resp/redirect "/login") )))

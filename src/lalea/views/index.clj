@@ -3,11 +3,18 @@
             [noir.response :as resp]
             [noir.session :as session]
             [lalea.models.user :as user])
-  (:use [noir.core :only [defpage pre-route]]
+  (:use [noir.core :only [defpage pre-route url-for]]
+        [noir.request]
         [hiccup.page]
         [hiccup.core]))
 
-(pre-route [:any [":anything" :anything #"^(?!\/login$).*"]] {} (when-not (user/logged-in?) (resp/redirect "/login")))
+(defn get-referer []
+  (:headers (ring-request)) "referer")
+
+(pre-route [:any [":anything" :anything #"^(?!\/login$).*"]] {} 
+  (when-not (user/logged-in?) 
+      (resp/redirect (str "/login?origin=" (:uri (ring-request))))))
+      ;(resp/redirect (url-for login {:origin  (:uri (ring-request)) }))))
 
 
 (defpage "/"
