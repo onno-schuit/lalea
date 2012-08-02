@@ -19,8 +19,6 @@
       (submit-button "Login"))))
 
 
-
-
 (defpage [:post "/login"] {:as candidate}
   (if (user/login! candidate)
     (do 

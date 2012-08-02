@@ -1,5 +1,6 @@
 (ns lalea.models.user
-  (require [noir.session :as session]))
+  (require [noir.session :as session]
+           [noir.util.crypt :as crypt]))
 (load "/lalea/config")
 
 (defentity user
@@ -19,7 +20,7 @@
 
 (defn login! [{:keys [username password] :as user}]
   (let [{stored-pass :password} (first (load-by-username username))]
-    (if (and stored-pass (= password stored-pass))
+    (if (and stored-pass (crypt/compare password stored-pass))
       (do
         (session/put! :username username)))))
       ;(vali/set-error :username "Invalid username or password"))))
