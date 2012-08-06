@@ -24,3 +24,14 @@
       (do
         (session/put! :username username)))))
       ;(vali/set-error :username "Invalid username or password"))))
+
+
+;; assoc : associate key with a new value and return new ('updated') map
+(defn encrypt-password [{password :password :as user}]
+  (assoc user :password (crypt/encrypt password)))
+
+;; Example:
+; (update user
+;   (set-fields {:password (crypt/encrypt "topsecret")})
+;   (where {:username [= "onno"]}))
+
