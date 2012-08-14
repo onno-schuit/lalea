@@ -19,10 +19,12 @@
   
 
 (defn login! [{:keys [username password] :as user}]
-  (let [{stored-pass :password} (first (load-by-username username))]
+  ;; kormasql DBAL always returns a result as a collection, so we need to use 'first'
+  (let [{stored-pass :password user-id :id} (first (load-by-username username))]
     (if (and stored-pass (crypt/compare password stored-pass))
       (do
-        (session/put! :username username)))))
+        (session/put! :username username)
+        (session/put! :user-id user-id)))))
       ;(vali/set-error :username "Invalid username or password"))))
 
 

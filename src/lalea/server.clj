@@ -2,6 +2,7 @@
   (:require [noir.server :as server]))
 
 (server/load-views-ns 'lalea.views)
+;(server/load-views "src/lalea/views/subdir/")
 
 (defn -main [& m]
   (let [mode (keyword (or (first m) :dev))
