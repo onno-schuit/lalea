@@ -1,7 +1,9 @@
 (ns lalea.models.user
   (require [noir.session :as session]
            [noir.util.crypt :as crypt]))
-(load "/lalea/config")
+
+(load-file "./src/lalea/config.clj")
+
 
 (defentity user
     (table :users))

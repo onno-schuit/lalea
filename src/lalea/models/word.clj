@@ -1,5 +1,6 @@
 (ns lalea.models.word)
-(load "/lalea/config")
+
+(load-file "./src/lalea/config.clj")
 
 (defentity word
     (table :words))

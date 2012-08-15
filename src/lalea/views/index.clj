@@ -28,8 +28,8 @@
 (defpartial drill [item]
   [:tr
     [:td (item :label)]
-    [:td (link-to (str "/delete-drill?id=" (item :id)) "Delete")]
-    [:td (link-to (str "/edit-drill?id=" (item :id)) "Edit")]
+    [:td (link-to (str "/drill/delete?id=" (item :id)) "Delete")]
+    [:td (link-to (str "/drill/edit?id=" (item :id)) "Edit")]
     [:td (link-to (str "/play?id=" (item :id)) "Play!")] ])
 
 

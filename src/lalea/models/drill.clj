@@ -1,5 +1,5 @@
 (ns lalea.models.drill)
-(load "/lalea/config")
+(load-file "./src/lalea/config.clj")
 
 (defentity drill
     (table :drills))
