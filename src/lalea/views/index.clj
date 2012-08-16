@@ -20,16 +20,18 @@
 
 (defpartial new-list []
   [:p
-   (label  "drill[name]" "New list:")
-   (text-field "drill[name]")
-   (submit-button "Add")])
+   (form-to [:post "drill/create"]
+     (label  "label" "New list:")
+     (hidden-field "user_id" (session/get :user-id))
+     (text-field "label")
+     (submit-button "Add"))])
 
 
 (defpartial drill [item]
   [:tr
     [:td (item :label)]
-    [:td (link-to (str "/drill/delete?id=" (item :id)) "Delete")]
-    [:td (link-to (str "/drill/edit?id=" (item :id)) "Edit")]
+    [:td (link-to (str "/drill/delete?id=" (item :id) "&user_id=" (session/get :user-id)) "Delete")]
+    [:td (link-to (str "/drill/edit?id=" (item :id)"&user_id=" (session/get :user-id)) "Edit")]
     [:td (link-to (str "/play?id=" (item :id)) "Play!")] ])
 
 

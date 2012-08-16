@@ -12,13 +12,43 @@
         [hiccup.element]))
 
 
-(defpage "/drill/edit"
-  []
-  (common/layout
-    [:p "Welcome to lalea from drill/edit (admin/drill.clj)"]))
+(defpartial word-pair [pair]
+  [:tr
+    [:td (pair :label)]
+    [:td (pair :meaning)]
+    [:td (link-to (str "/word/delete?id=" (pair :id) "&user_id=" (session/get :user-id)) "Delete")]
+    [:td (link-to (str "/word/edit?id=" (pair :id)"&user_id=" (session/get :user-id)) "Edit")] ])
 
 
-(defpage "/drill/delete"
-  []
-  (common/layout
-    [:p "Welcome to lalea from drill/delete (admin/drill.clj)"]))
+(defpartial list-of-words [words]
+  [:table
+    [:tr 
+      [:th "Word / Phrase"]
+      [:th "Meaning"]]
+    (map word-pair words)])
+
+
+(defpage [:get "/drill/edit"] {:as a-drill}
+  (if (common/check-ownership (a-drill :user_id))
+    (common/layout
+      [:p (str "Exercise: " "title-of-exercise")]
+      (list-of-words []))))
+
+
+(defpage [:get "/drill/delete"] {:as obsolete-drill}
+  (if (common/check-ownership (obsolete-drill :user_id))
+    (do
+      ;; sqlkorma's delete always seems to return false, so no sense in checking return value...
+      (drill/destroy obsolete-drill)
+      (resp/redirect "/"))))
+
+
+(defpage [:post "/drill/create"] {:as new-drill}
+  (if (common/check-ownership (new-drill :user_id))
+    (if (drill/save new-drill)
+      (resp/redirect "/")
+      (do 
+        ;; Replace this with a Flash error message and display original form
+        (println "Sorry, something went wrong while saving your drill")
+        (resp/redirect "/")))))
+
