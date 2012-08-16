@@ -11,6 +11,12 @@
     (where {:user_id [= user-id]})))
 
 
+(defn load-by-id-and-user-id
+  [id user-id]
+  (first (select drill
+    (where {:user_id [= user-id] :id [= id]}))))
+
+
 (defn save
   [mutated-drill]
   (if (mutated-drill :id)
