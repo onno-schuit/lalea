@@ -23,24 +23,39 @@
    [:td (submit-button "Add")]])
 
 
-(defpartial word-pair [pair]
-  [:tr
-    [:td (pair :label)]
-    [:td (pair :meaning)]
-    [:td (link-to (str "/word/delete?id=" (pair :id) "&user_id=" (session/get :user-id) "&drill_id=" (pair :drill_id)) "Delete")]
-    [:td (link-to (str "/word/edit?id=" (pair :id)"&user_id=" (session/get :user-id) "&drill_id=" (pair :drill_id)) "Edit")] ])
+(defpartial edit-word-pair [{:keys [id drill_id label meaning]}] 
+  [:td 
+    (hidden-field "id" id)
+    (hidden-field "user_id" (session/get :user-id))
+    (hidden-field "drill_id" drill_id)
+    (text-field "label" label)]
+  [:td (text-field "meaning" meaning)]
+  [:td (submit-button "Add")])
 
 
-(defpartial list-of-words [words drill-id]
+(defpartial list-word-pair [pair]
+   [:td (pair :label)]
+   [:td (pair :meaning)]
+   [:td (link-to (str "/word/delete?id=" (pair :id) "&user_id=" (session/get :user-id) "&drill_id=" (pair :drill_id)) "Delete")]
+   [:td (link-to (str "/drill/edit?word_id=" (pair :id) "&user_id=" (session/get :user-id) "&id=" (pair :drill_id)) "Edit")])
+
+(defpartial word-pair [word-id pair]
+    [:tr
+      (if (= (str word-id) (str (:id pair)))
+        (edit-word-pair pair)
+        (list-word-pair pair))])
+
+
+(defpartial list-of-words [words drill-id word-id]
   [:table
     [:tr 
       [:th "Word / Phrase"]
       [:th "Meaning"]]
-    (new-word-pair drill-id)
-    (map word-pair words)])
+    (when (nil? word-id) (new-word-pair drill-id))
+    (map (partial word-pair word-id) words)])
 
 
-(defpage [:get "/drill/edit"] {:keys [user_id id]}
+(defpage [:get "/drill/edit"] {:keys [user_id id word_id]}
   (let [a-drill (drill/load-by-id-and-user-id id user_id)]
     ;(when (and (common/check-identity user_id) (not (nil? a-drill))) ;; -- too implementation dependent 
     ;                                                                       (load-by-id-and-user-id may not return nil but may
@@ -49,7 +64,7 @@
       (common/layout
         [:p (str "Exercise: " (a-drill :label) )]
         (form-to [:post "/word/create"]
-          (list-of-words (word/load-by-drill-id id) id))))))
+          (list-of-words (word/load-by-drill-id id) id word_id))))))
 
 
 (defpage [:get "/drill/delete"] {:as obsolete-drill}
