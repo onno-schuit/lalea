@@ -17,6 +17,11 @@
     (where {:user_id [= user-id] :id [= id]}))))
 
 
+(defn is-owner? [provided-user-id owner-id]
+  (if (and owner-id provided-user-id)
+    (= (Integer. provided-user-id) (Integer. owner-id))))
+
+
 (defn save
   [mutated-drill]
   (if (mutated-drill :id)

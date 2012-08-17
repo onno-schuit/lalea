@@ -27,8 +27,8 @@
   [:tr
     [:td (pair :label)]
     [:td (pair :meaning)]
-    [:td (link-to (str "/word/delete?id=" (pair :id) "&user_id=" (session/get :user-id)) "Delete")]
-    [:td (link-to (str "/word/edit?id=" (pair :id)"&user_id=" (session/get :user-id)) "Edit")] ])
+    [:td (link-to (str "/word/delete?id=" (pair :id) "&user_id=" (session/get :user-id) "&drill_id=" (pair :drill_id)) "Delete")]
+    [:td (link-to (str "/word/edit?id=" (pair :id)"&user_id=" (session/get :user-id) "&drill_id=" (pair :drill_id)) "Edit")] ])
 
 
 (defpartial list-of-words [words drill-id]
@@ -41,15 +41,19 @@
 
 
 (defpage [:get "/drill/edit"] {:keys [user_id id]}
-  (if (common/check-ownership user_id)
-    (common/layout
-      [:p (str "Exercise: " ((drill/load-by-id-and-user-id id user_id) :label) )]
-      (form-to [:post "/word/create"]
-        (list-of-words (word/load-by-drill-id id) id)))))
+  (let [a-drill (drill/load-by-id-and-user-id id user_id)]
+    ;(when (and (common/check-identity user_id) (not (nil? a-drill))) ;; -- too implementation dependent 
+    ;                                                                       (load-by-id-and-user-id may not return nil but may
+    ;                                                                        still have 'failed')
+    (when (and (common/check-identity user_id) (drill/is-owner? user_id (:user_id a-drill)))
+      (common/layout
+        [:p (str "Exercise: " (a-drill :label) )]
+        (form-to [:post "/word/create"]
+          (list-of-words (word/load-by-drill-id id) id))))))
 
 
 (defpage [:get "/drill/delete"] {:as obsolete-drill}
-  (if (common/check-ownership (obsolete-drill :user_id))
+  (if (common/check-identity (obsolete-drill :user_id))
     (do
       ;; sqlkorma's delete always seems to return false, so no sense in checking return value...
       (drill/destroy obsolete-drill)
@@ -57,7 +61,7 @@
 
 
 (defpage [:post "/drill/create"] {:as new-drill}
-  (if (common/check-ownership (new-drill :user_id))
+  (if (common/check-identity (new-drill :user_id))
     (if (drill/save new-drill)
       (resp/redirect "/")
       (do 

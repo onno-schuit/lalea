@@ -16,5 +16,5 @@
 
 ;; Please note: this is ONLY secure if you always use the user_id in a WHERE clause (not just the record's id)
 ;; Also, the assumption here is that the session's user-id cannot be compromised...
-(defn check-ownership [untrusted-user-id]
+(defn check-identity [untrusted-user-id]
   (= (str untrusted-user-id) (str (session/get :user-id)) ))
