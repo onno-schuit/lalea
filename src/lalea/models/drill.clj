@@ -1,5 +1,13 @@
-(ns lalea.models.drill)
+(ns lalea.models.drill 
+  (:require [noir.validation :as vali]))
 (load-file "./src/lalea/config.clj")
+
+
+(defn valid? [{:keys [label user_id]}]
+  (vali/rule (vali/has-value? label)
+             [:label "Please fill in a name for your list"])
+  (vali/rule (number? user_id)
+             [:user_id "User id not found"]))
 
 (defentity drill
     (table :drills))
