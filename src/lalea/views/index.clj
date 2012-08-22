@@ -18,12 +18,14 @@
 
 
 
-(defpartial new-list []
+(defpartial new-list [list]
   [:p
-   (form-to [:post "drill/create"]
+   (form-to [:post "/drill/save"]
+     (when (list :id)
+       (hidden-field "id" (:id list)))
      (label  "label" "New list:")
      (hidden-field "user_id" (session/get :user-id))
-     (text-field "label")
+     (text-field "label" (:label list))
      (submit-button "Add"))])
 
 
@@ -44,8 +46,12 @@
   []
   (common/layout
     [:p "Welcome to lalea from index.clj"]
-    (new-list)
+    (new-list {})
     (list-of-drills (drill/load-by-user-id (session/get :user-id)))))
 
 
-
+(defpage [:get "/drill/updatetitle"] {:keys [user_id id]}
+(let [a-drill (drill/load-by-id-and-user-id id user_id)]
+  (when (and (common/check-identity user_id) (drill/is-owner? user_id (:user_id a-drill)))
+    (common/layout
+      (new-list a-drill)))))

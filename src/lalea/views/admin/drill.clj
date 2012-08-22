@@ -62,7 +62,9 @@
     ;                                                                        still have 'failed')
     (when (and (common/check-identity user_id) (drill/is-owner? user_id (:user_id a-drill)))
       (common/layout
-        [:p (str "Exercise: " (a-drill :label) )]
+        [:p 
+         (str "Exercise: " (a-drill :label) " " ) 
+         (link-to (str "/drill/updatetitle?user_id=" user_id "&id=" id) "edit title" )]
         (form-to [:post "/word/create"]
           (list-of-words (word/load-by-drill-id id) id word_id))))))
 
@@ -75,7 +77,7 @@
       (resp/redirect "/"))))
 
 
-(defpage [:post "/drill/create"] {:as new-drill}
+(defpage [:post "/drill/save"] {:as new-drill}
   (if (common/check-identity (new-drill :user_id))
     (if (drill/save new-drill)
       (resp/redirect "/")
@@ -83,4 +85,3 @@
         ;; Replace this with a Flash error message and display original form
         (println "Sorry, something went wrong while saving your drill")
         (resp/redirect "/")))))
-
