@@ -78,10 +78,12 @@
 
 
 (defpage [:post "/drill/save"] {:as new-drill}
+  ;(common/is-owner? (word/load-by-id id) (session/get :user-id))
   (if (common/check-identity (new-drill :user_id))
-    (if (drill/save new-drill)
-      (resp/redirect "/")
-      (do 
-        ;; Replace this with a Flash error message and display original form
-        (println "Sorry, something went wrong while saving your drill")
-        (resp/redirect "/")))))
+    (let [drill-id (drill/save new-drill)]
+      (if (number? drill-id)
+        (resp/redirect str("/drill/edit?user_id=" (:new-drill :user_id) "&id=" drill-id))
+        (do 
+          ;; Replace this with a Flash error message and display original form
+          (println "Sorry, something went wrong while saving your drill")
+          (resp/redirect "/"))))))

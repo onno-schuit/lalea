@@ -28,7 +28,8 @@
     (do
       (update drill
         (set-fields {:label (mutated-drill :label)})
-        (where {:id [= (mutated-drill :id)] :user_id [= (mutated-drill :user_id)]})))
+        (where {:id [= (mutated-drill :id)] :user_id [= (mutated-drill :user_id)]}))
+      (mutated-drill :id))
     (do
       (insert drill
         (values {:label (mutated-drill :label) :user_id (mutated-drill :user_id)})))))
