@@ -18,3 +18,7 @@
 ;; Also, the assumption here is that the session's user-id cannot be compromised...
 (defn check-identity [untrusted-user-id]
   (= (str untrusted-user-id) (str (session/get :user-id)) ))
+
+
+(defpartial error-item [[first-error]]
+    [:div.error first-error])

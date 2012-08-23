@@ -3,12 +3,6 @@
 (load-file "./src/lalea/config.clj")
 
 
-(defn valid? [{:keys [label user_id]}]
-  (vali/rule (vali/has-value? label)
-             [:label "Please fill in a name for your list"])
-  (vali/rule (number? user_id)
-             [:user_id "User id not found"]))
-
 (defentity drill
     (table :drills))
 
@@ -30,17 +24,26 @@
     (= (Integer. provided-user-id) (Integer. owner-id))))
 
 
+(defn valid? [{:keys [label user_id]}]
+  (vali/rule (vali/has-value? label)
+             [:label "Please fill in a name for your list"])
+  (vali/rule (number? (Integer. user_id))
+             [:user_id "User id not found"])
+  (not (vali/errors?)))
+
+
 (defn save
   [mutated-drill]
-  (if (mutated-drill :id)
-    (do
-      (update drill
-        (set-fields {:label (mutated-drill :label)})
-        (where {:id [= (mutated-drill :id)] :user_id [= (mutated-drill :user_id)]}))
-      (mutated-drill :id))
-    (do
-      (insert drill
-        (values {:label (mutated-drill :label) :user_id (mutated-drill :user_id)})))))
+  (when (valid? mutated-drill)
+    (if (mutated-drill :id)
+      (do
+        (update drill
+          (set-fields {:label (mutated-drill :label)})
+          (where {:id [= (mutated-drill :id)] :user_id [= (mutated-drill :user_id)]}))
+        (mutated-drill :id))
+      (do
+        (insert drill
+          (values {:label (mutated-drill :label) :user_id (mutated-drill :user_id)}))))))
 
 
 (defn destroy

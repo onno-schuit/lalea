@@ -3,7 +3,8 @@
             [noir.response :as resp]
             [noir.session :as session]
             [lalea.models.user :as user]
-            [lalea.models.drill :as drill])
+            [lalea.models.drill :as drill]
+            [noir.validation :as vali])
   (:use [noir.core :only [defpage pre-route url-for defpartial]]
         [noir.request]
         [hiccup.page]
@@ -20,13 +21,14 @@
 
 (defpartial new-list [list]
   [:p
-   (form-to [:post "/drill/save"]
-     (when (list :id)
-       (hidden-field "id" (:id list)))
-     (label  "label" "New list:")
-     (hidden-field "user_id" (session/get :user-id))
-     (text-field "label" (:label list))
-     (submit-button "Add"))])
+    (vali/on-error :label common/error-item)
+    (form-to [:post "/drill/save"]
+      (when (list :id)
+        (hidden-field "id" (:id list)))
+      (label  "label" "New list:")
+      (hidden-field "user_id" (session/get :user-id))
+      (text-field "label" (:label list))
+      (submit-button "Add"))])
 
 
 (defpartial drill [item]

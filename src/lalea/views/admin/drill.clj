@@ -5,7 +5,7 @@
             [lalea.models.user :as user]
             [lalea.models.word :as word]
             [lalea.models.drill :as drill])
-  (:use [noir.core :only [defpage pre-route url-for defpartial]]
+  (:use [noir.core :only [defpage pre-route url-for defpartial render]]
         [noir.request]
         [hiccup.page]
         [hiccup.core]
@@ -78,12 +78,11 @@
 
 
 (defpage [:post "/drill/save"] {:as new-drill}
-  ;(common/is-owner? (word/load-by-id id) (session/get :user-id))
   (if (common/check-identity (new-drill :user_id))
     (let [drill-id (drill/save new-drill)]
       (if (number? drill-id)
         (resp/redirect str("/drill/edit?user_id=" (:new-drill :user_id) "&id=" drill-id))
         (do 
           ;; Replace this with a Flash error message and display original form
-          (println "Sorry, something went wrong while saving your drill")
-          (resp/redirect "/"))))))
+          (println "Sorry, your drill is not valid and could not be saved. Please try again.")
+          (render "/" new-drill))))))
