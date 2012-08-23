@@ -1,5 +1,7 @@
 (ns lalea.models.drill 
-  (:require [noir.validation :as vali]))
+  (:require [noir.validation :as vali]
+            [lalea.models.word :as word]))
+            
 (load-file "./src/lalea/config.clj")
 
 
@@ -17,6 +19,12 @@
   [id user-id]
   (first (select drill
     (where {:user_id [= user-id] :id [= id]}))))
+
+
+(defn load-game [id user-id]
+  (let [a-drill (load-by-id-and-user-id id user-id)]
+    (when (not (nil? a-drill))
+      (assoc a-drill :words (shuffle (map #(:id %1) (word/load-by-drill-id id)))))))
 
 
 (defn is-owner? [provided-user-id owner-id]

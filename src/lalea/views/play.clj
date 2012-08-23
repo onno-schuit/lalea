@@ -12,7 +12,15 @@
         [hiccup.element]))
 
 
-(defpage "/play"
+(defpartial display-question [word-id]
+  [:p "Show word here..."])
+
+(defpage [:get "/play" {:keys [drill_id]}]
   []
   (common/layout
-    [:p "Welcome to lalea from play.clj"]))
+    (display-question 1)))
+
+
+(defpage [:post "/play"] {:keys [drill_id words]}
+  (common/layout
+    (display-question 1)))

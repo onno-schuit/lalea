@@ -4,7 +4,8 @@
             [noir.session :as session]
             [lalea.models.user :as user]
             [lalea.models.word :as word]
-            [lalea.models.drill :as drill])
+            [lalea.models.drill :as drill]
+            [noir.validation :as vali])
   (:use [noir.core :only [defpage pre-route url-for defpartial render]]
         [noir.request]
         [hiccup.page]
@@ -55,18 +56,21 @@
     (map (partial word-pair word-id) words)])
 
 
-(defpage [:get "/drill/edit"] {:keys [user_id id word_id]}
+(defpage [:get "/drill/edit"] {:keys [user_id id word_id] :as word-pair}
   (let [a-drill (drill/load-by-id-and-user-id id user_id)]
     ;(when (and (common/check-identity user_id) (not (nil? a-drill))) ;; -- too implementation dependent 
     ;                                                                       (load-by-id-and-user-id may not return nil but may
     ;                                                                        still have 'failed')
-    (when (and (common/check-identity user_id) (drill/is-owner? user_id (:user_id a-drill)))
+    (if (and (common/check-identity user_id) (drill/is-owner? user_id (:user_id a-drill)))
       (common/layout
         [:p 
          (str "Exercise: " (a-drill :label) " " ) 
          (link-to (str "/drill/updatetitle?user_id=" user_id "&id=" id) "edit title" )]
         (form-to [:post "/word/create"]
-          (list-of-words (word/load-by-drill-id id) id word_id))))))
+          (vali/on-error :label common/error-item)
+          (vali/on-error :meaning common/error-item)
+          (list-of-words (word/load-by-drill-id id) id word_id)))
+      (println "Sorry, no access granted!"))))
 
 
 (defpage [:get "/drill/delete"] {:as obsolete-drill}
