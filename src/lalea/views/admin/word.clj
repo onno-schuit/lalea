@@ -25,10 +25,12 @@
          :word_id (:id new-word)}))))
 
 
-(defpage [:get "/word/delete"] {:keys [id drill_id] :as obsolete-word}
-  (if (and (word/is-owner? (word/load-by-id id) (session/get :user-id)) (word/destroy id))
-    (resp/redirect (str "/drill/edit?id=" drill_id "&user_id=" (session/get :user-id) ))
-    (do 
-      ;; Replace this with a Flash error message and display original form
-      (println "Sorry, something went wrong while deleting the word - meaning pair")
-      (resp/redirect (str "/drill/edit?id=" drill_id "&user_id=" (session/get :user-id) )))))
+(defpage [:get "/word/delete"] {:keys [id] :as obsolete-word}
+  (let [a-word (word/load-by-id id)]
+    (if (and (drill/load-by-id-and-user-id (:drill_id a-word) (session/get :user-id)) (word/destroy id))
+    ;(if (and (word/is-owner? (word/load-by-id id) (session/get :user-id)) (word/destroy id))
+     (resp/redirect (str "/drill/edit?id=" (:drill_id a-word) "&user_id=" (session/get :user-id) ))
+     (do 
+       ;; Replace this with a Flash error message and display original form
+       (println "Sorry, something went wrong while deleting the word - meaning pair")
+       (resp/redirect (str "/drill/edit?id=" (:drill_id a-word) "&user_id=" (session/get :user-id) ))))))

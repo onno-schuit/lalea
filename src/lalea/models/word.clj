@@ -1,6 +1,5 @@
 (ns lalea.models.word
-  (:require [lalea.models.drill :as drill]
-            [noir.validation :as vali]
+  (:require [noir.validation :as vali]
             [clojure.string :as str]))
 
 (load-file "./src/lalea/config.clj")
@@ -20,8 +19,9 @@
   (first (select word (where {:id [= id]}))))
 
 
-(defn is-owner? [word user-id]
-  (first (drill/load-by-id-and-user-id (:drill_id word) user-id)))
+;(defn is-owner? [word user-id drill-id]
+;  (= (:drill_id word) drill-id))
+;  ;;(first (drill/load-by-id-and-user-id (:drill_id word) user-id)))
 
 
 (defn valid? [{:keys [label meaning user_id drill_id]}]
