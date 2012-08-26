@@ -43,7 +43,8 @@
       (do
         (update word
           (set-fields {:label label :meaning meaning})
-          (where {:id [= (mutated-word-pair :id)]})))
+          (where {:id [= (mutated-word-pair :id)]}))
+        (mutated-word-pair :id))
       (do
         (insert word
           (values {:label label :meaning meaning :drill_id drill_id}))))))
