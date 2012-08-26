@@ -1,6 +1,7 @@
 (ns lalea.models.drill 
   (:require [noir.validation :as vali]
-            [lalea.models.word :as word]))
+            [lalea.models.word :as word])
+  (:use [hiccup.util :only [escape-html]]))
             
 (load-file "./src/lalea/config.clj")
 
@@ -46,12 +47,12 @@
     (if (mutated-drill :id)
       (do
         (update drill
-          (set-fields {:label (mutated-drill :label)})
+          (set-fields {:label (escape-html (mutated-drill :label))})
           (where {:id [= (mutated-drill :id)] :user_id [= (mutated-drill :user_id)]}))
         (mutated-drill :id))
       (do
         (insert drill
-          (values {:label (mutated-drill :label) :user_id (mutated-drill :user_id)}))))))
+          (values {:label (escape-html (mutated-drill :label)) :user_id (mutated-drill :user_id)}))))))
 
 
 (defn destroy

@@ -1,6 +1,7 @@
 (ns lalea.models.word
   (:require [noir.validation :as vali]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:use [hiccup.util :only [escape-html]]))
 
 (load-file "./src/lalea/config.clj")
 
@@ -42,12 +43,15 @@
     (if (mutated-word-pair :id)
       (do
         (update word
-          (set-fields {:label label :meaning meaning})
+          (set-fields {:label (escape-html label) :meaning (escape-html meaning)})
           (where {:id [= (mutated-word-pair :id)]}))
         (mutated-word-pair :id))
       (do
         (insert word
-          (values {:label label :meaning meaning :drill_id drill_id}))))))
+          (values {
+            :label (escape-html label)
+            :meaning (escape-html meaning)
+            :drill_id drill_id}))))))
 
 
 (defn destroy
