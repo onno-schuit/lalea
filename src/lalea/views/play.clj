@@ -3,7 +3,8 @@
             [noir.response :as resp]
             [noir.session :as session]
             [lalea.models.user :as user]
-            [lalea.models.drill :as drill])
+            [lalea.models.drill :as drill]
+            [lalea.models.word :as word])
   (:use [noir.core :only [defpage pre-route url-for defpartial]]
         [noir.request]
         [hiccup.page]
@@ -12,15 +13,28 @@
         [hiccup.element]))
 
 
-(defpartial display-question [word-id]
-  [:p "Show word here..."])
+(defpartial display-question [word word-ids]
+  [:p (:label word)
+    (form-to [:post "/play"]
+      (hidden-field "id" (:id word)) 
+      (hidden-field "word-ids" word-ids)
+      [:div
+        (text-field "meaning") 
+        (submit-button "Next")])])
 
-(defpage [:get "/play" {:keys [drill_id]}]
-  []
+
+(defpartial show [game]
+  [:h1 (:label game)])
+
+
+(defpage [:get "/play"] {:keys [id]}
+  (let [a-game (drill/load-game id (session/get :user-id))]
+    (common/layout
+      (show a-game)
+      (display-question (word/load-by-id (first (:words a-game))) (:words a-game) ) )))
+
+
+(defpage [:post "/play"] {:keys [id word-ids]}
   (common/layout
-    (display-question 1)))
-
-
-(defpage [:post "/play"] {:keys [drill_id words]}
-  (common/layout
-    (display-question 1)))
+    ;(show a-game)
+    (display-question (first word-ids))))
