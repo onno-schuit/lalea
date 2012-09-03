@@ -1,6 +1,6 @@
 # lalea
 
-An experimental website written in noir. 
+An experimental website written in noir (a web app platform in Clojure). 
 
 ## Install & Run
 
