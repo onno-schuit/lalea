@@ -15,7 +15,7 @@
 
 (defpartial display-question [word word-ids]
   [:p (:label word)
-    (form-to [:post "/play"]
+    (form-to [:post "/check-answer"]
       (hidden-field "id" (:id word)) 
       (hidden-field "word-ids" (clojure.string/join "," word-ids))
       [:div
@@ -34,9 +34,24 @@
       (display-question (word/load-by-id (first (:words a-game))) (rest (:words a-game)) ) )))
 
 
-(defpage [:post "/play"] {:keys [id word-ids]}
+(defpage [:get "/next-question"] {:keys [id word-ids]}
   (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
     (common/layout
       ;(show a-game)
       (display-question (word/load-by-id (first ids))  (rest ids)))))
       ;(display-question (first word-ids) (rest word-ids))))
+
+
+(defpartial correct []
+  [:h2 "correct"])
+
+
+(defpartial incorrect []
+  [:h2 "that is not correct..."])
+
+
+(defpage [:post "/check-answer"] {:keys [id word-ids meaning] :as answer}
+  (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
+    (if (= meaning (:meaning (word/load-by-id id)))
+      (resp/redirect (str "/next-question?id=" id "&word-ids=" (clojure.string/join "," (rest ids)) ))
+      (incorrect))))
