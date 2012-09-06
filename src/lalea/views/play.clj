@@ -37,9 +37,7 @@
 (defpage [:get "/next-question"] {:keys [id word-ids]}
   (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
     (common/layout
-      ;(show a-game)
-      (display-question (word/load-by-id (first ids))  (rest ids)))))
-      ;(display-question (first word-ids) (rest word-ids))))
+      (display-question (word/load-by-id id)  ids))))
 
 
 (defpartial correct []
@@ -53,5 +51,5 @@
 (defpage [:post "/check-answer"] {:keys [id word-ids meaning] :as answer}
   (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
     (if (= meaning (:meaning (word/load-by-id id)))
-      (resp/redirect (str "/next-question?id=" id "&word-ids=" (clojure.string/join "," (rest ids)) ))
+      (resp/redirect (str "/next-question?id=" (first ids) "&word-ids=" (clojure.string/join "," (rest ids)) ))
       (incorrect))))
