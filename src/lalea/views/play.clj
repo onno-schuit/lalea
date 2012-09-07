@@ -34,10 +34,17 @@
       (display-question (word/load-by-id (first (:words a-game))) (rest (:words a-game)) ) )))
 
 
+(defpartial results []
+  [:h1 "Results!"])
+
+
 (defpage [:get "/next-question"] {:keys [id word-ids]}
-  (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
-    (common/layout
-      (display-question (word/load-by-id id)  ids))))
+  (common/layout
+    (if (not (= word-ids ""))
+      (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
+        (display-question (word/load-by-id id)  ids))
+      (results))))
+
 
 
 (defpartial correct []
