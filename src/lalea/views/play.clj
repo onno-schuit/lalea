@@ -13,10 +13,11 @@
         [hiccup.element]))
 
 
-(defpartial display-question [word word-ids]
+(defpartial display-question [word word-ids game-id]
   [:p (:label word)
     (form-to [:post "/check-answer"]
       (hidden-field "id" (:id word)) 
+      (hidden-field "game-id" game-id) 
       (hidden-field "word-ids" (clojure.string/join "," word-ids))
       [:div
         (text-field "meaning") 
@@ -29,9 +30,7 @@
 
 (defpage [:get "/play"] {:keys [id]}
   (let [a-game (drill/load-game id (session/get :user-id))]
-    (common/layout
-      (show a-game)
-      (display-question (word/load-by-id (first (:words a-game))) (rest (:words a-game)) ) )))
+    (resp/redirect (str "/play-round?game-id=" id "&word-ids=" (clojure.string/join "," (:words a-game)) ))))
 
 
 (defpartial results []
@@ -44,25 +43,28 @@
     (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))))
 
 
-(defpage [:get "/play-round"] {:keys [id word-ids]}
+(defpage [:get "/play-round"] {:keys [game-id word-ids]}
   (common/layout
-    (if (not (= "" id))
+    (show (drill/load-game game-id (session/get :user-id)))
+    (if (not (= "" word-ids))
       (let [ids (map-ids-string-to-vector word-ids)]
-        (display-question (word/load-by-id id)  ids))
+        (display-question (word/load-by-id (first ids))  (rest ids) game-id))
       (results))))
 
 
-(defpartial correct []
-  [:h2 "correct"])
+(defpartial correction [word]
+  [:h2 "Correct is:"]
+  [:div (:label word)]
+  [:div (:meaning word)])
 
 
-(defpartial incorrect [word]
-  [:h2 "that is not correct..."])
+(defn handle-wrong-answer [current-word]
+  ;; add id to session object of errors (same id can be stored multiple times to compute frequencies)
+  ;; if frequency == 3, show correction, otherwise allow another attempt
+  (correction current-word))
 
-
-(defpage [:post "/check-answer"] {:keys [id word-ids meaning] :as answer}
-  (let [ids (map-ids-string-to-vector word-ids)
-        current-word (word/load-by-id id)]
+(defpage [:post "/check-answer"] {:keys [id word-ids meaning game-id] :as answer}
+  (let [current-word (word/load-by-id id)]
     (if (= meaning (:meaning current-word))
-      (resp/redirect (str "/play-round" (first ids) "&word-ids=" (clojure.string/join "," (rest ids)) ))
-      (incorrect current-word))))
+      (resp/redirect (str "/play-round?word-ids=" word-ids "&game-id=" game-id))
+      (handle-wrong-answer current-word))))

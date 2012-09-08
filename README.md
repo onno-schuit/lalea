@@ -45,7 +45,8 @@ to the next item.
    - correct: next round
    - incorrect: 
       - store id of the word
-      - show pair again
+      - show pair again (twice, if necessary) -- use session object to store ids of wrong words
+        (multiple ids of the same word, if necessary)
 4. Next round
    - No more words: end
    - Other words: go to 2
