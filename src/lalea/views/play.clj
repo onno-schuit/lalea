@@ -38,25 +38,31 @@
   [:h1 "Results!"])
 
 
+(defn map-ids-string-to-vector [word-ids]
+  (if (= word-ids "")
+    []
+    (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))))
+
+
 (defpage [:get "/next-question"] {:keys [id word-ids]}
   (common/layout
-    (if (not (= word-ids ""))
-      (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
+    (if (not (= "" id))
+      (let [ids (map-ids-string-to-vector word-ids)]
         (display-question (word/load-by-id id)  ids))
       (results))))
-
 
 
 (defpartial correct []
   [:h2 "correct"])
 
 
-(defpartial incorrect []
+(defpartial incorrect [word]
   [:h2 "that is not correct..."])
 
 
 (defpage [:post "/check-answer"] {:keys [id word-ids meaning] :as answer}
-  (let [ids (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))]
-    (if (= meaning (:meaning (word/load-by-id id)))
+  (let [ids (map-ids-string-to-vector word-ids)
+        current-word (word/load-by-id id)]
+    (if (= meaning (:meaning current-word))
       (resp/redirect (str "/next-question?id=" (first ids) "&word-ids=" (clojure.string/join "," (rest ids)) ))
-      (incorrect))))
+      (incorrect current-word))))

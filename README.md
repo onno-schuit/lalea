@@ -37,6 +37,25 @@ turn, the correct translation is displayed if you failed, otherwise you proceed
 to the next item.
 
 
+## Flow
+
+1. Collect all word - meaning pairs for a game
+2. present pair
+3. check answer:
+   - correct: next round
+   - incorrect: 
+      - store id of the word
+      - show pair again
+4. Next round
+   - No more words: end
+   - Other words: go to 2
+5. End: show results
+
+
+
 ## License
 
 Copyright Solin (C) 2012
+
+
+
