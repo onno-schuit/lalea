@@ -44,7 +44,7 @@
     (map (fn [id] (Integer/parseInt id)) (clojure.string/split word-ids #","))))
 
 
-(defpage [:get "/next-question"] {:keys [id word-ids]}
+(defpage [:get "/play-round"] {:keys [id word-ids]}
   (common/layout
     (if (not (= "" id))
       (let [ids (map-ids-string-to-vector word-ids)]
@@ -64,5 +64,5 @@
   (let [ids (map-ids-string-to-vector word-ids)
         current-word (word/load-by-id id)]
     (if (= meaning (:meaning current-word))
-      (resp/redirect (str "/next-question?id=" (first ids) "&word-ids=" (clojure.string/join "," (rest ids)) ))
+      (resp/redirect (str "/play-round" (first ids) "&word-ids=" (clojure.string/join "," (rest ids)) ))
       (incorrect current-word))))
