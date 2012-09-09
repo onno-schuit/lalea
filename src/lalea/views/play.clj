@@ -13,6 +13,18 @@
         [hiccup.element]))
 
 
+(defn get-errors []
+  (session/get :errors))
+
+
+(defn set-errors-to-empty []
+  (session/put! :errors []))
+
+
+(defn add-error [current-word]
+  (session/put! :errors (conj (session/get :errors) (:id current-word))))
+
+
 (defpartial display-question [word word-ids game-id]
   [:p (:label word)
     (form-to [:post "/check-answer"]
@@ -29,6 +41,8 @@
 
 
 (defpage [:get "/play"] {:keys [id]}
+  (do
+    (set-errors-to-empty))
   (let [a-game (drill/load-game id (session/get :user-id))]
     (resp/redirect (str "/play-round?game-id=" id "&word-ids=" (clojure.string/join "," (:words a-game)) ))))
 
@@ -58,10 +72,25 @@
   [:div (:meaning word)])
 
 
+(defn max-errors? [current-word errors]
+  (<= 3 ((frequencies errors) (:id current-word))))
+
+
+(defn retry [current-word]
+  (println "Implement me!"))
+
+
 (defn handle-wrong-answer [current-word]
   ;; add id to session object of errors (same id can be stored multiple times to compute frequencies)
   ;; if frequency == 3, show correction, otherwise allow another attempt
-  (correction current-word))
+  (do
+    (println (add-error current-word))
+    (println (get-errors)))
+  (if (max-errors? current-word (get-errors))
+    (correction current-word)
+    (retry current-word)))
+
+
 
 (defpage [:post "/check-answer"] {:keys [id word-ids meaning game-id] :as answer}
   (let [current-word (word/load-by-id id)]
