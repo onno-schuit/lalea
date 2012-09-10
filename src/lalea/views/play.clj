@@ -76,24 +76,34 @@
   (<= 3 ((frequencies errors) (:id current-word))))
 
 
-(defn retry [current-word]
-  (println "Implement me!"))
+(defpage [:get "/retry"] {:keys [game-id word-ids id]}
+  (common/layout
+    (show (drill/load-game game-id (session/get :user-id)))
+    [:h3 "Sorry, try again..."]
+    (let [ids (map-ids-string-to-vector word-ids)]
+      (display-question (word/load-by-id id)  ids game-id))))
 
 
-(defn handle-wrong-answer [current-word]
+(defpage [:get "/correction"] {:keys [game-id word-ids id]}
+  (common/layout
+    (show (drill/load-game game-id (session/get :user-id)))
+    (correction (word/load-by-id id))
+    [:p (link-to (str "/play-round?&game-id=" game-id "&word-ids=" word-ids) "Next")]))
+
+
+
+(defn handle-wrong-answer [current-word word-ids game-id]
   ;; add id to session object of errors (same id can be stored multiple times to compute frequencies)
   ;; if frequency == 3, show correction, otherwise allow another attempt
   (do
-    (println (add-error current-word))
-    (println (get-errors)))
+    (add-error current-word))
   (if (max-errors? current-word (get-errors))
-    (correction current-word)
-    (retry current-word)))
-
+    (resp/redirect (str "/correction?id=" (:id current-word) "&word-ids=" word-ids "&game-id=" game-id))
+    (resp/redirect (str "/retry?id=" (:id current-word) "&word-ids=" word-ids "&game-id=" game-id))))
 
 
 (defpage [:post "/check-answer"] {:keys [id word-ids meaning game-id] :as answer}
   (let [current-word (word/load-by-id id)]
     (if (= meaning (:meaning current-word))
       (resp/redirect (str "/play-round?word-ids=" word-ids "&game-id=" game-id))
-      (handle-wrong-answer current-word))))
+      (handle-wrong-answer current-word word-ids game-id))))
