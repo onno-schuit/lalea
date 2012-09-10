@@ -25,6 +25,11 @@ We're focussing on:
 * Basic login system
 
 
+## Not in Scope
+
+i18n - there are some wrappers around the apparently excellent Java i18n: https://github.com/ptaoussanis/tower
+
+
 ## Domain
 
 The website is a language learning tool. You make a list of words or phrases in

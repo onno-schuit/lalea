@@ -47,8 +47,15 @@
     (resp/redirect (str "/play-round?game-id=" id "&word-ids=" (clojure.string/join "," (:words a-game)) ))))
 
 
-(defpartial results []
-  [:h1 "Results!"])
+(defpartial results [game-id]
+  [:h1 "Results"]
+  (if (= 0 (count (frequencies (get-errors))))
+    [:p "Well done! You've got everything right!"]
+    [:p (str "You've made a few mistakes: "
+             (count (frequencies (get-errors)))
+             " errors out of "
+             (count (:words (drill/load-game game-id (session/get :user-id))))
+             " words")]))
 
 
 (defn map-ids-string-to-vector [word-ids]
@@ -63,7 +70,7 @@
     (if (not (= "" word-ids))
       (let [ids (map-ids-string-to-vector word-ids)]
         (display-question (word/load-by-id (first ids))  (rest ids) game-id))
-      (results))))
+      (results game-id))))
 
 
 (defpartial correction [word]

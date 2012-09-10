@@ -1,6 +1,7 @@
 (ns lalea.views.common
   (:require [noir.session :as session])
   (:use [noir.core :only [defpartial]]
+        [hiccup.element]
         [hiccup.page :only [include-css html5]]))
 
 (defpartial layout [& content]
@@ -9,6 +10,7 @@
                [:title "lalea"]
                (include-css "/css/reset.css")]
               [:body
+               [:div (link-to "/" "Home")]
                [:h1 "Lalea Rocks!"]
                [:div#wrapper
                 content]]))
